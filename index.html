@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Daily Upgrade System</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#687386;
+    --accent:#2563eb; --accent2:#7c3aed; --green:#16a34a;
+    --border:#e5e7eb; --shadow:0 8px 24px rgba(23,32,51,.07);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+  .container{max-width:1100px;margin:auto;padding:24px}
+  header{background:linear-gradient(135deg,#172554,#2563eb 55%,#7c3aed);color:white;border-radius:22px;padding:30px;box-shadow:var(--shadow)}
+  h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+  header p{margin:6px 0;opacity:.92}
+  .quote{margin-top:18px;padding:14px 16px;background:rgba(255,255,255,.12);border-radius:12px;font-style:italic}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+  button{border:1px solid var(--border);background:white;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+  button:hover{transform:translateY(-1px)}
+  .progress-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+  .progress-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .bar{height:10px;background:#e9edf4;border-radius:20px;overflow:hidden;margin-top:12px}
+  .bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--accent));transition:.3s}
+  .day{background:var(--card);border:1px solid var(--border);border-radius:16px;margin:14px 0;box-shadow:var(--shadow);overflow:hidden}
+  .day summary{list-style:none;cursor:pointer;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+  .day summary::-webkit-details-marker{display:none}
+  .day summary:hover{background:#fafbff}
+  .day-title{display:flex;align-items:center;gap:12px}
+  .day-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#eef2ff;font-size:20px}
+  .day-name{font-size:18px;font-weight:800}
+  .day-sub{font-size:13px;color:var(--muted)}
+  .chevron{font-size:20px;color:var(--muted);transition:.2s}
+  details[open] .chevron{transform:rotate(180deg)}
+  .content{padding:0 20px 20px;border-top:1px solid var(--border)}
+  .slot{display:grid;grid-template-columns:110px 1fr;gap:18px;padding:17px 0;border-bottom:1px solid #edf0f4}
+  .time{font-weight:800;color:var(--accent)}
+  .task-title{font-size:16px;font-weight:800;margin-bottom:3px}
+  .desc{color:var(--muted);font-size:14px}
+  .checks{margin-top:9px;display:grid;gap:7px}
+  label{display:flex;gap:9px;align-items:flex-start;font-size:14px;cursor:pointer}
+  input[type=checkbox]{margin-top:4px;accent-color:var(--green);width:16px;height:16px}
+  .tip{margin-top:10px;padding:11px 13px;background:#f8fafc;border-left:3px solid var(--accent);border-radius:7px;font-size:13px}
+  .ref{display:inline-block;margin-top:8px;color:var(--accent);text-decoration:none;font-size:13px;font-weight:700}
+  .ref:hover{text-decoration:underline}
+  .motivation{margin:16px 0;padding:15px 16px;border-radius:12px;background:linear-gradient(90deg,#eff6ff,#f5f3ff);font-weight:700}
+  .weekly{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .mini{background:white;border:1px solid var(--border);border-radius:13px;padding:15px}
+  .mini h3{margin:0 0 8px}
+  .mini ul{padding-left:20px;margin:7px 0;color:var(--muted);font-size:14px}
+  .reset-note{font-size:12px;color:var(--muted);margin-top:8px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:28px 0}
+  @media(max-width:650px){.container{padding:14px}.slot{grid-template-columns:1fr;gap:5px}.time{font-size:13px}.day summary{padding:15px}.content{padding:0 15px 15px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>🚀 My Daily Upgrade System</h1>
+  <p>A simple system for fitness, exams, technology, awareness, nutrition and personal growth.</p>
+  <div class="quote" id="quote">“You don't need a perfect day. You need a day you can repeat.”</div>
+</header>
+
+<div class="toolbar">
+  <button onclick="expandAll()">Expand all</button>
+  <button onclick="collapseAll()">Collapse all</button>
+  <button onclick="resetChecks()">Reset today's checkpoints</button>
+</div>
+
+<div class="progress-card">
+  <div class="progress-top">
+    <strong>Today's progress</strong>
+    <strong id="progressText">0%</strong>
+  </div>
+  <div class="bar"><span id="progressBar"></span></div>
+  <div class="reset-note">Your checkboxes are saved in this browser automatically.</div>
+</div>
+
+<section class="weekly">
+  <div class="mini"><h3>🏋️ Fitness</h3><ul><li>Mon: Full body A</li><li>Wed: Legs + core</li><li>Fri: Full body C</li><li>Sat/Sun: optional mobility/walk</li></ul></div>
+  <div class="mini"><h3>🎯 Exams</h3><ul><li>Maths</li><li>Reasoning</li><li>GS/GA</li><li>PYQs + mock analysis</li></ul></div>
+  <div class="mini"><h3>💻 Career</h3><ul><li>Databricks</li><li>PySpark/Delta Lake</li><li>New IT technologies</li><li>Build + document</li></ul></div>
+  <div class="mini"><h3>📰 Awareness</h3><ul><li>Geopolitics</li><li>Sports</li><li>AI/IT</li><li>Auto/entertainment</li></ul></div>
+</section>
+
+<div id="days"></div>
+
+<div class="motivation">
+  ⭐ Rule of the system: <b>Never miss twice.</b> If one day goes badly, don't try to “make up” everything. Restart with the next block.
+</div>
+
+<footer>
+  Built for consistency • Review every Sunday • Adjust the timings to your actual college/work schedule
+</footer>
+</div>
+
+<script>
+const schedule = [
+{
+day:"Monday", icon:"💪", sub:"Strong start • Maths • Databricks • Geopolitics",
+slots:[
+["6:30–7:15","Exercise — Full Body A","Build posture, back, shoulders, arms and core.",
+["Warm up 5 min","Push-ups 3×8–15","Backpack rows 3×10–15","Pike push-ups 3×6–12","Backpack curls 3×10–15","Bird dog + dead bug","Plank 3×30–60 sec"],
+"Start easy. Focus on controlled movement rather than maximum reps."],
+["8:00–10:00","Government Exam — Maths","Deep-work block for NTPC/JE/SSC JE/SBI common quantitative topics.",
+["Study one topic","Solve 25–40 questions","Mark mistakes","Review formulas"],
+"Prioritize concepts → PYQs → timed practice."],
+["10:15–10:45","News — Geopolitics","Understand 2–3 important developments instead of endlessly scrolling.",
+["India + major global story","Read the background","Write: What happened? Why does it matter?"],
+"Try to explain one story aloud in 30 seconds.",
+"https://www.reuters.com/world/"],
+["11:00–12:00","Databricks — Core Learning","Strengthen Spark, PySpark, Delta Lake and Databricks fundamentals.",
+["Learn one concept","Use official documentation","Write/run a small example"],
+"Don't just watch. Build something small.",
+"https://docs.databricks.com/"],
+["Evening — 30 min","Recall + Communication","Explain one exam concept and one news topic without looking at notes.",
+["Speak for 2 minutes","Write 3 things learned","List tomorrow's top 3 tasks"],
+"Communication improves when you regularly explain what you know."]
+]},
+{
+day:"Tuesday", icon:"🧠", sub:"Reasoning • AI/technology • light recovery",
+slots:[
+["Morning — 20 min","Mobility / Walk","Keep the body active without a hard workout.",
+["Brisk walk","Cat-cow","Shoulder mobility","Bird dog"],
+"Recovery is part of training."],
+["8:00–10:00","Government Exam — Reasoning","Practice reasoning patterns common to RRB, SSC and banking exams.",
+["Learn one pattern","Solve 25–40 questions","Time yourself","Record mistakes"],
+"Use PYQs after learning each pattern."],
+["10:15–10:45","News — Sports","Follow major cricket, football and other significant sporting events.",
+["Know the result","Know the key player/team","Understand why it mattered"],
+"Focus on major stories rather than every match.",
+"https://www.espncricinfo.com/"],
+["11:00–12:00","IT Upgrade — New Technology","Research one modern technology and understand the problem it solves.",
+["What problem does it solve?","Who uses it?","What existed before it?","Is it appearing in job descriptions?"],
+"Use official docs and engineering blogs before influencer summaries.",
+"https://www.infoq.com/"],
+["Evening — 20 min","YouTube — Learning only","Watch one technical/exam video with a specific purpose.",
+["Write the video's 3 key points","Avoid autoplay rabbit holes"],
+"Learning video > motivational video."]
+]},
+{
+day:"Wednesday", icon:"🦵", sub:"Legs + core • Maths • IT industry",
+slots:[
+["6:30–7:15","Exercise — Legs + Core","Strengthen legs, glutes and core while supporting posture.",
+["Squats 3×15–20","Reverse lunges 3×10/leg","Glute bridges 3×15","Calf raises 3×20","Side plank","Dead bug"],
+"Progress gradually. Quality beats speed."],
+["8:00–10:00","Government Exam — Maths","Second quantitative session of the week.",
+["Practice weak topic","Solve PYQs","Review errors","10-minute formula recall"],
+"Spend more time analysing mistakes than celebrating correct answers."],
+["10:15–10:45","News — IT & Business","Know what is happening in Indian IT, cloud, AI and hiring.",
+["One company development","One industry trend","One technology development"],
+"Ask: how could this affect IT jobs?" ,
+"https://www.thehindu.com/sci-tech/technology/"],
+["11:00–12:00","Databricks — Hands-on","Build a small Spark/Delta exercise.",
+["Read","Code","Run","Explain the result"],
+"Keep a GitHub folder called learning-lab and document your experiments.",
+"https://docs.delta.io/"],
+["Evening — 15 min","Daily Review","Close the day deliberately.",
+["Update checklist","Write one mistake","Write one improvement for tomorrow"],
+"Small daily corrections compound."]
+]},
+{
+day:"Thursday", icon:"🤖", sub:"GS • AI • new tech research",
+slots:[
+["Morning — 20 min","Walk / Mobility","Light movement and recovery.",
+["Walk","Shoulder mobility","Hip mobility"],
+"Keep screen-heavy study days physically active."],
+["8:00–10:00","Government Exam — GS/GA","Rotate science, polity, history, geography, economy and current affairs.",
+["Learn one area","Solve PYQs","Create 5 recall questions"],
+"Use active recall instead of repeatedly rereading."],
+["10:15–10:45","News — AI","Understand one AI development deeply enough to explain it.",
+["What launched?","What can it do?","What are limitations?","Why is industry interested?"],
+"https://www.technologyreview.com/"],
+["11:00–12:00","Career — Research + Build","Pick one technology and connect it to your existing skills.",
+["Read official source","Check 3 real use cases","Find a GitHub example","Add one note/project idea"],
+"Use LinkedIn as a discovery tool, not your primary technical source.",
+"https://github.com/trending"],
+["Evening — 20 min","Communication Practice","Explain today's AI topic as if talking to a friend.",
+["30-second version","2-minute version","One real-world example"],
+"Simple explanations show genuine understanding."]
+]},
+{
+day:"Friday", icon:"🔥", sub:"Full body • PYQs • Databricks • automobiles",
+slots:[
+["6:30–7:15","Exercise — Full Body C","Combine upper body, legs and core.",
+["Push-ups","Backpack rows","Squats","Reverse lunges","Pike push-ups","Backpack curls","Plank"],
+"Finish the week with consistency, not exhaustion."],
+["8:00–10:00","Government Exam — PYQs","Solve previous-year questions under realistic conditions.",
+["Timed PYQ set","Check answers","Classify mistakes","Revise weak topic"],
+"PYQs are your feedback system."],
+["10:15–10:45","News — Automobiles","Follow EVs, Indian manufacturers, launches and major global auto technology.",
+["One launch","One technology","One company/business development"],
+"Know enough to discuss the topic; you don't need every specification.",
+"https://www.autocarindia.com/"],
+["11:00–12:00","Databricks — Weekly Build","Consolidate what you learned this week into one practical exercise.",
+["Build","Test","Document","Commit to Git"],
+"Every week should leave behind a tangible artifact."],
+["Evening — 15 min","Weekly Wins","Record what improved this week.",
+["Exam progress","IT progress","Fitness progress","One thing to improve next week"],
+"Progress is easier to see when you record it."]
+]},
+{
+day:"Saturday", icon:"📚", sub:"Mock test • project work • entertainment",
+slots:[
+["Morning — 2 hrs","Government Exam — Full Mock","Take a timed mock or full previous paper.",
+["No phone","Follow exam timing","Analyse every mistake"],
+"Score is feedback, not identity."],
+["Late morning — 90 min","Mock Analysis","Understand why each wrong answer happened.",
+["Concept gap","Calculation error","Question misread","Time pressure"],
+"Fix the cause, not just the question."],
+["Afternoon — 2 hrs","IT Project / Databricks","Build a meaningful mini-feature or extend your data engineering project.",
+["Implement one feature","Document architecture","Commit code"],
+"Prefer building over collecting courses."],
+["Evening — 30 min","Entertainment Awareness","Read/watch major entertainment news so you stay socially aware.",
+["One movie/OTT development","One major personality/story"],
+"Keep it intentional; entertainment should refresh you."]
+]},
+{
+day:"Sunday", icon:"🔄", sub:"Recovery • weekly review • planning",
+slots:[
+["Morning","Recovery / Walk","Take a lighter day.",
+["Walk","Stretch","Mobility","Sleep/recovery"],
+"Rest helps you stay consistent next week."],
+["10:00–11:00","Weekly Knowledge Review","Review your week's exam, technology and news notes.",
+["5 important news stories","3 exam weak areas","1 technology learned","1 useful conversation topic"],
+"Try explaining your five topics without notes."],
+["11:00–12:00","Career Upgrade Session","Review IT trends and choose one topic for next week.",
+["Check job descriptions","Check LinkedIn trends","Read an engineering blog","Choose one skill"],
+"Choose based on relevance, not hype."],
+["Afternoon","Nutrition & Meal Planning","Prepare the week around protein, vegetables, fruits, grains and adequate calories.",
+["Plan protein sources","Buy fruits/vegetables","Keep simple snacks ready","Drink enough water"],
+"Consistency beats a complicated diet."],
+["Evening — 20 min","Plan Next Week","Set only three major goals.",
+["One exam goal","One IT goal","One fitness goal"],
+"End the week with clarity, not guilt."]
+]}
+];
+
+const quotes = [
+"“You don't need a perfect day. You need a day you can repeat.”",
+"“Small progress every day becomes a very different life after a year.”",
+"“Discipline is choosing what you want most over what you want now.”",
+"“Don't compete with yesterday's version of someone else. Improve your own baseline.”",
+"“Learn. Build. Move. Reflect. Repeat.”"
+];
+
+function makeId(text){ return text.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+
+function render(){
+ const root=document.getElementById('days');
+ root.innerHTML='';
+ schedule.forEach((d,di)=>{
+   const details=document.createElement('details');
+   details.className='day';
+   if(di===new Date().getDay()-1) details.open=true;
+   const summary=document.createElement('summary');
+   summary.innerHTML=`<div class="day-title"><div class="day-icon">${d.icon}</div><div><div class="day-name">${d.day}</div><div class="day-sub">${d.sub}</div></div></div><div class="chevron">⌄</div>`;
+   const content=document.createElement('div'); content.className='content';
+   d.slots.forEach((s,si)=>{
+     const [time,title,desc,checks,tip,ref]=s;
+     const slot=document.createElement('div'); slot.className='slot';
+     const cidBase=makeId(d.day+'-'+si);
+     let checkHTML=checks.map((c,ci)=>{
+       const id=cidBase+'-'+ci;
+       return `<label><input type="checkbox" id="${id}" data-check> <span>${c}</span></label>`;
+     }).join('');
+     slot.innerHTML=`<div class="time">${time}</div><div>
+       <div class="task-title">${title}</div>
+       <div class="desc">${desc}</div>
+       <div class="checks">${checkHTML}</div>
+       <div class="tip">💡 ${tip}</div>
+       ${ref?`<a class="ref" href="${ref}" target="_blank" rel="noopener">Open reference ↗</a>`:''}
+     </div>`;
+     content.appendChild(slot);
+   });
+   details.appendChild(summary); details.appendChild(content); root.appendChild(details);
+ });
+ document.querySelectorAll('[data-check]').forEach(cb=>{
+   const key='routine-'+cb.id;
+   cb.checked=localStorage.getItem(key)==='1';
+   cb.addEventListener('change',()=>{localStorage.setItem(key,cb.checked?'1':'0');updateProgress();});
+ });
+ updateProgress();
+}
+
+function updateProgress(){
+ const boxes=[...document.querySelectorAll('[data-check]')];
+ const done=boxes.filter(x=>x.checked).length;
+ const pct=boxes.length?Math.round(done/boxes.length*100):0;
+ document.getElementById('progressText').textContent=pct+'%';
+ document.getElementById('progressBar').style.width=pct+'%';
+}
+function expandAll(){document.querySelectorAll('details').forEach(d=>d.open=true)}
+function collapseAll(){document.querySelectorAll('details').forEach(d=>d.open=false)}
+function resetChecks(){
+ if(!confirm("Reset all saved checkpoints on this browser?")) return;
+ document.querySelectorAll('[data-check]').forEach(cb=>{localStorage.removeItem('routine-'+cb.id);cb.checked=false});
+ updateProgress();
+}
+document.getElementById('quote').textContent=quotes[new Date().getDay()%quotes.length];
+render();
+</script>
+</body>
+</html>
